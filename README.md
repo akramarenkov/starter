@@ -7,3 +7,52 @@
 ## Purpose
 
 Library that allows you to control the start of work of multiple goroutines
+
+## Usage
+
+Example:
+
+```go
+package main
+
+import (
+    "fmt"
+    "sync"
+    "time"
+
+    "github.com/akramarenkov/starter"
+)
+
+func main() {
+    const (
+        quantity = 5
+    )
+
+    wg := &sync.WaitGroup{}
+    defer wg.Wait()
+
+    starter := starter.New()
+
+    for range quantity {
+        wg.Add(1)
+        starter.Ready()
+
+        go func() {
+            defer wg.Done()
+
+            // Preparing for main work
+            time.Sleep(time.Second)
+
+            starter.Set()
+
+            // Main work
+            time.Sleep(time.Second)
+        }()
+    }
+
+    starter.Go()
+
+    // Output:
+    //
+}
+```
