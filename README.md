@@ -16,7 +16,6 @@ Example:
 package main
 
 import (
-    "fmt"
     "sync"
     "time"
 
