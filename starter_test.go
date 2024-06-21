@@ -12,6 +12,10 @@ func TestStarter(t *testing.T) {
 	testStarter(t, 5, 200*time.Millisecond, 10*time.Millisecond)
 }
 
+func TestReadyN(_ *testing.T) {
+	testReadyN(5)
+}
+
 func testStarter(
 	t *testing.T,
 	quantity int,
@@ -64,4 +68,26 @@ func testStarter(
 			float64(diffLimit),
 		)
 	}
+}
+
+func testReadyN(quantity int) {
+	wg := &sync.WaitGroup{}
+	defer wg.Wait()
+
+	starter := New()
+
+	wg.Add(quantity)
+	starter.ReadyN(quantity)
+
+	starter.ReadyN(-2 * quantity)
+
+	for range quantity {
+		go func() {
+			defer wg.Done()
+
+			starter.Set()
+		}()
+	}
+
+	starter.Go()
 }

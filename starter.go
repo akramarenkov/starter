@@ -30,6 +30,19 @@ func (str *Starter) Ready() {
 	str.wg.Add(1)
 }
 
+// Increases counter of controlled goroutines to specified value.
+//
+// It must be called in a control goroutine.
+//
+// Negative value is not supported and does not change the counter.
+func (str *Starter) ReadyN(value int) {
+	if value < 0 {
+		return
+	}
+
+	str.wg.Add(value)
+}
+
 // Marks the controlled goroutine as up for a start.
 //
 // It must be called in a controlled goroutine before doing the work.
