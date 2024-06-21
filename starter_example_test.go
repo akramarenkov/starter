@@ -38,7 +38,6 @@ func ExampleStarter() {
 	starter.Go()
 
 	// Output:
-	//
 }
 
 func ExampleStarter_complicated() {
