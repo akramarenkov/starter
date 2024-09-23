@@ -1,6 +1,6 @@
 module github.com/akramarenkov/starter
 
-go 1.22.4
+go 1.23
 
 require github.com/stretchr/testify v1.9.0
 
