@@ -51,6 +51,5 @@ func main() {
 
     starter.Go()
     // Output:
-    //
 }
 ```
