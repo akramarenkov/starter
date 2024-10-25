@@ -2,8 +2,14 @@
 package starter
 
 import (
+	"errors"
 	"sync"
 	"time"
+)
+
+var (
+	ErrNegativeReadyValue = errors.New("negative ready value is specified")
+	ErrZeroReadyValue     = errors.New("zero ready value is specified")
 )
 
 // Starts of work of multiple goroutines at the same time.
@@ -34,10 +40,14 @@ func (str *Starter) Ready() {
 //
 // It must be called in a control goroutine.
 //
-// Negative value is not supported and does not change the counter.
+// Negative and zero values is not supported and causes panic.
 func (str *Starter) ReadyN(value int) {
 	if value < 0 {
-		return
+		panic(ErrNegativeReadyValue)
+	}
+
+	if value == 0 {
+		panic(ErrZeroReadyValue)
 	}
 
 	str.wg.Add(value)

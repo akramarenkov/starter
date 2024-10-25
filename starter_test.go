@@ -12,10 +12,6 @@ func TestStarter(t *testing.T) {
 	testStarter(t, 5, 200*time.Millisecond, 10*time.Millisecond)
 }
 
-func TestReadyN(_ *testing.T) {
-	testReadyN(5)
-}
-
 func testStarter(
 	t *testing.T,
 	quantity int,
@@ -32,7 +28,12 @@ func testStarter(
 
 	for id := range quantity {
 		wg.Add(1)
-		starter.Ready()
+
+		if quantity%2 == 0 {
+			starter.Ready()
+		} else {
+			starter.ReadyN(1)
+		}
 
 		go func(id int) {
 			defer wg.Done()
@@ -70,24 +71,9 @@ func testStarter(
 	}
 }
 
-func testReadyN(quantity int) {
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-
+func TestInvalidReadyN(t *testing.T) {
 	starter := New()
 
-	wg.Add(quantity)
-	starter.ReadyN(quantity)
-
-	starter.ReadyN(-2 * quantity)
-
-	for range quantity {
-		go func() {
-			defer wg.Done()
-
-			starter.Set()
-		}()
-	}
-
-	starter.Go()
+	require.Panics(t, func() { starter.ReadyN(-1) })
+	require.Panics(t, func() { starter.ReadyN(0) })
 }
