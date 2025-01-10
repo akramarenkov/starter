@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Library that allows you to control the start of work of multiple goroutines
+Library that provides to control the start of work of multiple goroutines
 
 ## Usage
 

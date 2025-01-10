@@ -1,4 +1,4 @@
-// Starts of work of multiple goroutines at the same time.
+// Library that provides to control the start of work of multiple goroutines.
 package starter
 
 import (
