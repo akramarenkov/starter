@@ -9,37 +9,33 @@ import (
 )
 
 func TestStarter(t *testing.T) {
-	testStarter(t, 5, 200*time.Millisecond, 10*time.Millisecond)
-}
+	const (
+		workersQuantity = 5
+		baseWorkDelay   = 200 * time.Millisecond
+		startDiffLimit  = 10 * time.Millisecond
+	)
 
-func testStarter(
-	t *testing.T,
-	quantity int,
-	delay time.Duration,
-	diffLimit time.Duration,
-) {
-	wg := &sync.WaitGroup{}
+	var wg sync.WaitGroup
 
 	starter := New()
-
-	starts := make(chan time.Duration, quantity)
+	starts := make(chan time.Duration, workersQuantity)
 
 	beginAt := time.Now()
 
-	for id := range quantity {
+	for id := range workersQuantity {
 		wg.Add(1)
 
-		if quantity%2 == 0 {
+		if id%2 == 0 {
 			starter.Ready()
 		} else {
 			starter.ReadyN(1)
 		}
 
-		go func(id int) {
+		go func() {
 			defer wg.Done()
 
 			// Preparing for main work
-			time.Sleep(time.Duration(id+1) * delay)
+			time.Sleep(time.Duration(id+1) * baseWorkDelay)
 
 			starter.Set()
 
@@ -47,7 +43,7 @@ func testStarter(
 
 			// Main work
 			time.Sleep(time.Second)
-		}(id)
+		}()
 	}
 
 	starter.Go()
@@ -56,22 +52,24 @@ func testStarter(
 
 	close(starts)
 
-	require.InDelta(t,
-		time.Duration(quantity)*delay,
+	require.InDelta(
+		t,
+		time.Duration(workersQuantity)*baseWorkDelay,
 		starter.StartedAt().Sub(beginAt),
-		float64(diffLimit),
+		float64(startDiffLimit),
 	)
 
 	for started := range starts {
-		require.InDelta(t,
-			time.Duration(quantity)*delay,
+		require.InDelta(
+			t,
+			time.Duration(workersQuantity)*baseWorkDelay,
 			started,
-			float64(diffLimit),
+			float64(startDiffLimit),
 		)
 	}
 }
 
-func TestInvalidReadyN(t *testing.T) {
+func TestReadyNInvalid(t *testing.T) {
 	starter := New()
 
 	require.Panics(t, func() { starter.ReadyN(-1) })
