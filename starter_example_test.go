@@ -9,77 +9,76 @@ import (
 )
 
 func ExampleStarter() {
-	const (
-		quantity = 5
-	)
+	const workersQuantity = 5
 
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
+	var wg sync.WaitGroup
 
-	starter := starter.New()
+	actuator := starter.New()
 
-	for range quantity {
-		wg.Add(1)
-		starter.Ready()
+	wg.Add(workersQuantity)
+	actuator.ReadyN(workersQuantity)
 
+	for range workersQuantity {
 		go func() {
 			defer wg.Done()
 
 			// Preparing for main work
 			time.Sleep(time.Second)
 
-			starter.Set()
+			actuator.Set()
 
 			// Main work
 			time.Sleep(time.Second)
 		}()
 	}
 
-	starter.Go()
+	actuator.Go()
+
+	wg.Wait()
 	// Output:
 }
 
 func ExampleStarter_complicated() {
 	const (
-		quantity  = 5
-		delay     = 200 * time.Millisecond
-		diffLimit = 10 * time.Millisecond
+		workersQuantity = 5
+		baseWorkDelay   = 200 * time.Millisecond
+		startDiffLimit  = 10 * time.Millisecond
 	)
 
-	wg := &sync.WaitGroup{}
+	var wg sync.WaitGroup
 
-	starter := starter.New()
+	actuator := starter.New()
+
+	wg.Add(workersQuantity)
+	actuator.ReadyN(workersQuantity)
 
 	beginAt := time.Now()
 
-	for id := range quantity {
-		wg.Add(1)
-		starter.Ready()
-
-		go func(id int) {
+	for id := range workersQuantity {
+		go func() {
 			defer wg.Done()
 
 			// Preparing for main work
-			time.Sleep(time.Duration(id+1) * delay)
+			time.Sleep(time.Duration(id+1) * baseWorkDelay)
 
-			starter.Set()
+			actuator.Set()
 
-			diff := time.Since(beginAt) - quantity*delay
+			startDiff := time.Since(beginAt) - workersQuantity*baseWorkDelay
 
-			fmt.Println(diff < diffLimit && diff > -diffLimit)
+			fmt.Println(startDiff < startDiffLimit && startDiff > -startDiffLimit)
 
 			// Main work
 			time.Sleep(time.Second)
-		}(id)
+		}()
 	}
 
-	starter.Go()
+	actuator.Go()
 
 	wg.Wait()
 
-	diff := starter.StartedAt().Sub(beginAt) - quantity*delay
+	startDiff := actuator.StartedAt().Sub(beginAt) - workersQuantity*baseWorkDelay
 
-	fmt.Println(diff < diffLimit && diff > -diffLimit)
+	fmt.Println(startDiff < startDiffLimit && startDiff > -startDiffLimit)
 	// Output:
 	// true
 	// true

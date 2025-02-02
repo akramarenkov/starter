@@ -16,6 +16,7 @@ Example:
 package main
 
 import (
+    "fmt"
     "sync"
     "time"
 
@@ -23,33 +24,32 @@ import (
 )
 
 func main() {
-    const (
-        quantity = 5
-    )
+    const workersQuantity = 5
 
-    wg := &sync.WaitGroup{}
-    defer wg.Wait()
+    var wg sync.WaitGroup
 
-    starter := starter.New()
+    actuator := starter.New()
 
-    for range quantity {
-        wg.Add(1)
-        starter.Ready()
+    wg.Add(workersQuantity)
+    actuator.ReadyN(workersQuantity)
 
+    for range workersQuantity {
         go func() {
             defer wg.Done()
 
             // Preparing for main work
             time.Sleep(time.Second)
 
-            starter.Set()
+            actuator.Set()
 
             // Main work
             time.Sleep(time.Second)
         }()
     }
 
-    starter.Go()
+    actuator.Go()
+
+    wg.Wait()
     // Output:
 }
 ```
