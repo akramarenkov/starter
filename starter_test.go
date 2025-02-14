@@ -15,8 +15,7 @@ func TestStarter(t *testing.T) {
 		startDiffLimit  = 10 * time.Millisecond
 	)
 
-	var wg sync.WaitGroup
-
+	wg := &sync.WaitGroup{}
 	starter := New()
 	starts := make(chan time.Duration, workersQuantity)
 

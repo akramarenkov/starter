@@ -26,8 +26,7 @@ import (
 func main() {
     const workersQuantity = 5
 
-    var wg sync.WaitGroup
-
+    wg := &sync.WaitGroup{}
     actuator := starter.New()
 
     wg.Add(workersQuantity)

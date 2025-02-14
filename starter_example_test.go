@@ -11,8 +11,7 @@ import (
 func ExampleStarter() {
 	const workersQuantity = 5
 
-	var wg sync.WaitGroup
-
+	wg := &sync.WaitGroup{}
 	actuator := starter.New()
 
 	wg.Add(workersQuantity)
@@ -45,8 +44,7 @@ func ExampleStarter_complicated() {
 		startDiffLimit  = 10 * time.Millisecond
 	)
 
-	var wg sync.WaitGroup
-
+	wg := &sync.WaitGroup{}
 	actuator := starter.New()
 
 	wg.Add(workersQuantity)

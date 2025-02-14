@@ -16,14 +16,13 @@ var (
 type Starter struct {
 	startedAt time.Time
 	trigger   chan struct{}
-	wg        *sync.WaitGroup
+	wg        sync.WaitGroup
 }
 
 // Creates Starter instance.
 func New() *Starter {
 	str := &Starter{
 		trigger: make(chan struct{}),
-		wg:      &sync.WaitGroup{},
 	}
 
 	return str
